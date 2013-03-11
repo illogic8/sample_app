@@ -6,7 +6,9 @@
 development:
   adapter: postgresql
   host: localhost
-  username: user
+  port: 5432
+  username: dev_user
+  password: test
   database: app-dev
 
 # Warning: The database defined as "test" will be erased and
@@ -14,10 +16,14 @@ development:
 # Do not set this db to the same as development or production.
 test:
   adapter: postgresql
-  username: user
+  host: localhost
+  username: dev_user
+  password: test
   database: app-test
 
 production:
   adapter: postgresql
-  username: user
-  database:app-prod
+  host: localhost
+  username: dev_user
+  password: test
+  database: app-prod
