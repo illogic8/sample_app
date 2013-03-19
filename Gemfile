@@ -47,6 +47,7 @@ gem 'jquery-rails', '2.0.2'
 # gem 'ruby-debug19', :require => 'ruby-debug'
 group :test do
 	gem 'capybara', '1.1.2'
+  gem 'factory_girl_rails', '4.1.0'
 end
 
 group :production do
