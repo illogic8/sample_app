@@ -161,6 +161,13 @@ input {
   height: auto !important;
 }
 
+/*test button */
+input.primary {
+  @extend .btn;
+  @extend .btn-large;
+  @extend .btn-primary;
+}
+
 #error_explanation {
   color: #f00;
   ul {
@@ -172,4 +179,19 @@ input {
 .field_with_errors {
   @extend .control-group;
   @extend .error;
+}
+
+/*users index */
+
+.users {
+  list-style: none;
+  margin: 0;
+  li {
+    overflow: auto;
+    padding: 10px 0;
+    border-top: 1px solid $grayLighter;
+    &:last-child {
+      border-bottom: 1px solid $grayLighter;
+    }
+  }
 }
