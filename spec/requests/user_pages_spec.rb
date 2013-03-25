@@ -9,8 +9,7 @@ describe "User pages" do
     create_user
 
     before(:each) do
-      visit signin_path 
-      valid_signin(user)
+      valid_signin user
       visit users_path
     end
 
@@ -36,7 +35,6 @@ describe "User pages" do
       describe "as an admin user" do
         let(:admin) { FactoryGirl.create(:admin) }
         before do
-          visit signin_path
           valid_signin admin
           visit users_path
         end
@@ -60,18 +58,25 @@ describe "User pages" do
   end 
 
   describe "profile page" do
-  	let(:user) { FactoryGirl.create(:user) }
+  	create_user
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
 
   	before { visit user_path(user) }
 
   	it { should have_selector('h1',    text: user.name) }
   	it { should have_title(user.name) }
+
+    describe "microposts" do
+      it { should have_content(m1.content) }
+      it { should have_content(m2.content) }
+      it { should have_content(user.microposts.count) }
+    end
   end
 
   describe "edit" do
     create_user
     before do
-      visit signin_path
       valid_signin(user)
       visit edit_user_path(user)
     end
@@ -126,9 +131,7 @@ describe "User pages" do
     end
 
     describe "with valid information" do
-      before do
-        valid_signup
-      end
+      before { valid_signup }
 
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)

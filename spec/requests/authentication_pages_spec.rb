@@ -11,10 +11,10 @@ describe "Authentication" do
   end 
 
   describe "signin" do
-  	before { visit signin_path }
 
     describe "with invalid information" do
-    	before { click_button "Sign in" }
+    	before { visit signin_path }
+      before { click_button "Sign in" }
      
         it { should have_title('Sign in') }
   	    it { should have_error_message('Invalid') }
@@ -44,6 +44,11 @@ describe "Authentication" do
     end
   end
 
+  describe "signed out" do
+    it { should_not have_link('Profile') }
+    it { should_not have_link('Settings') }
+  end
+
   describe "authorization" do
 
     describe "for non-signed in users" do
@@ -52,13 +57,36 @@ describe "Authentication" do
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)
-          valid_signin(user)
+          fill_in "Email",    with: user.email
+          fill_in "Password", with: user.password
+          click_button "Sign in" 
         end
 
         describe "after signing in" do
           it "should render the desired protected page" do
             page.should have_title("Edit user")
           end
+
+          describe "signing in again" do
+            before do
+              delete signout_path
+              valid_signin user
+            end
+            it "should render default (profile) page" do
+              page.should have_title(user.name)
+            end
+          end
+        end
+      end
+
+      describe "in the Microposts controller" do
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { response.should redirect_to(signin_path) }
+        end
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { response.should redirect_to(signin_path) }
         end
       end
 
@@ -84,10 +112,7 @@ describe "Authentication" do
     describe "as wrong user" do
       create_user
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }
-      before do
-        visit signin_path
-        valid_signin(user) 
-      end
+      before { valid_signin(user) }
 
       describe "visiting Users#edit page" do
         before {visit edit_user_path(wrong_user) }
@@ -104,16 +129,22 @@ describe "Authentication" do
       create_user
       let(:non_admin) { FactoryGirl.create(:user) }
 
-      before do
-        visit signin_path
-        valid_signin non_admin
-      end
+      before { valid_signin non_admin }
 
       describe "submitting a DELETE request to the Users#destroy action" do
         before { delete user_path(user) }
         specify { response.should redirect_to(root_path) }
       end
     end
-  end
 
+    describe "as an admin user" do
+      let(:admin) { FactoryGirl.create(:admin) }
+      before { valid_signin admin }
+
+      describe "submitting a DELETE request of self to the Users#destroy action" do
+        before { delete user_path(admin) }
+        specify { response.should redirect_to(root_path) }
+      end
+    end
+  end
 end
