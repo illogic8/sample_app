@@ -40,5 +40,13 @@ describe "Micropost pages" do
         expect { click_link "delete" }.to change(Micropost, :count).by(-1)
       end
     end
-  end		 
+  end	
+
+  describe "micropost pagination" do
+    before do
+      50.times {FactoryGirl.create(:micropost, user: user)}
+      visit root_path
+    end
+    it { should have_selector('div.pagination') }
+  end	 
 end
